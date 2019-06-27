@@ -12,6 +12,25 @@ def find(lab, pos):
     return lab_arr[0], lab_arr[1]
 
 
+def cut_word(lab, beg, end, wav_file, word):
+    file = wav_file.split('.')
+    name = file[0].split('/')
+
+    word_beg = lab[beg].split(" ")
+    t_beg = word_beg[0]
+    word_end = lab[end].split(" ")
+    t_end = word_end[1]
+
+    new, fs = sf.read(wav_file)
+
+    # režem riječ iz originalnog .wav file-a i spremam ju u .wav datoteku
+    if t_beg and t_end:
+        start = int(t_beg) * 0.0016
+        ending = int(t_end) * 0.0016
+        new_arr = new[int(start): int(ending)]
+        sf.write(f"rijeci_wav/{word}_{name[1]}.wav", new_arr, fs)
+
+
 def get_values(letter, lab, txt, wav_file):
     i = 0
     j = 1
@@ -80,6 +99,10 @@ def main(args):
         rmtree('zvucni_glasovi_wav')
     os.mkdir('zvucni_glasovi_wav')
 
+    if os.path.isdir('rijeci_wav'):
+        rmtree('rijeci_wav')
+    os.mkdir('rijeci_wav')
+
     dir_lab = os.listdir('lab')
     dir_txt = os.listdir('txt')
     dir_wav = os.listdir('wav')
@@ -96,6 +119,13 @@ def main(args):
 
         for i in range(len(txt_lines)):
             txt_arr = txt_lines[i].split(" ")
+
+        i = 0
+        j = 1
+        while i != len(txt_arr) - 1:
+            cut_word(lab_lines, j, j + len(txt_arr[i]), str_wav, txt_arr[i])  # funkcija u kojoj rezem rijec iz recenice
+            j += len(txt_arr[i])
+            i += 1
 
         letters = ['a', 'e', 'i', 'o', 'u', 'j', 'l', 'm', 'n', 'r', 'v', 'b', 'd', 'g', 'z']
         for let in letters:

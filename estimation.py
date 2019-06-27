@@ -34,6 +34,14 @@ def create_dirs():
         rmtree('zvucni_glasovi_after_sint')
     os.mkdir('zvucni_glasovi_after_sint')
 
+    if os.path.isdir('rijeci_after_sint'):
+        rmtree('rijeci_after_sint')
+    os.mkdir('rijeci_after_sint')
+
+    if os.path.isdir('slike_rijeci_after_sint'):
+        rmtree('slike_rijeci_after_sint')
+    os.mkdir('slike_rijeci_after_sint')
+
 
 def savefig(filename, figlist, letter, log=True):
     # h = 10
@@ -72,6 +80,30 @@ def savefig(filename, figlist, letter, log=True):
     plt.close()
 
 
+def estimate_word(word, name):
+    if os.path.exists(f'rijeci_wav/{word}_{name}.wav'):
+        f_bef, fs = sf.read(f'rijeci_wav/{word}_{name}.wav')
+
+        f0, timeaxis = pw.harvest(f_bef, fs)
+        f0_mask = pw.stonemask(f_bef, f0, timeaxis, fs)
+        sp = pw.cheaptrick(f_bef, f0_mask, timeaxis, fs)
+        ap = pw.d4c(f_bef, f0_mask, timeaxis, fs)
+        y = pw.synthesize(f0_mask, sp, ap, fs, pw.default_frame_period)
+
+        sf.write(f'rijeci_after_sint/{word}_after_sint_{name}-def.wav', y, fs)
+        savefig(f'slike_rijeci_after_sint/{word}_after_sint_{name}-def.png', [f_bef, y], word)
+
+        y = pw.synthesize(f0_mask, sp, ap, fs, 3.0)
+
+        sf.write(f'rijeci_after_sint/{word}_after_sint_{name}.wav', y, fs)
+        savefig(f'slike_rijeci_after_sint/{word}_after_sint_{name}.png', [f_bef, y], word)
+
+        y = pw.synthesize(f0_mask, sp, ap, fs, 20.0)
+
+        sf.write(f'rijeci_after_sint/{word}_after_sint_{name}-20.wav', y, fs)
+        savefig(f'slike_rijeci_after_sint/{word}_after_sint_{name}-20.png', [f_bef, y], word)
+
+
 def estimate(letter, name):
     fb = 0
     fm = 0
@@ -79,6 +111,7 @@ def estimate(letter, name):
     max_beg = 0
     max_mid = 0
     max_end = 0
+
     if os.path.exists(f'zvucni_glasovi_wav/novi_{letter}_beg_{name}.wav'):
         beg, fs = sf.read(f'zvucni_glasovi_wav/novi_{letter}_beg_{name}.wav')
 
@@ -208,13 +241,27 @@ def main(args):
     create_dirs()
 
     dir_wav = os.listdir('wav')
+    dir_txt = os.listdir('txt')
 
+    cnt = 0
     letters = ['a', 'e', 'i', 'o', 'u', 'j', 'l', 'm', 'n', 'r', 'v', 'b', 'd', 'g', 'z']
     for file in dir_wav:
+        txt = open(f'txt/{dir_txt[cnt]}', "r")
+        txt_lines = txt.readlines()
+
+        for br in range(len(txt_lines)):
+            txt_arr = txt_lines[br].split(" ")
+
+        i = 0
         name, ext = file.split('.')
+        while i != len(txt_arr) - 1:
+            estimate_word(txt_arr[i], name)  # funkcija u kojoj uspoređujem riječ prije i poslije sinteze
+            i += 1
+
         for let in letters:
             estimate(let, name)
             # print(name)
+        cnt += 1
 
 
 if __name__ == '__main__':
