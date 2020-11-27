@@ -1,4 +1,6 @@
-﻿## Project setup:
+﻿# Modeling and estimation of the fundamental frequency of speech with the world program
+ 
+ ## Project setup:
 
 1. Create virtual environment 
   * `virtual_env env_name`
