@@ -1,8 +1,17 @@
-﻿Postupak pokretanja:
+﻿## Project setup:
 
-1. Kreiramo virtual environment => virtual_env ime_environmenta
-2. Aktiviramo virtual environment => više o tome na poveznici https://docs.python-guide.org/dev/virtualenvs/
-3. Pokrenemo naredbu pip install -r requirements.txt kako bi instalirali sve potrebno za izvođenje programa
-3. Preselimo se pomoću terminala u folder gdje smo napravili clone repozitorija
-4. Pokrenemo naredbu python get_voice.py koja rastavlja zvučne glasove u zasebne .wav datoteke
-5. Pokrenemo naredbu python estimation.py koja pomoću programa world računa osnovnu frekvenciju (f0), spektralnu ovojnicu i aperiodičnost te provodi sintezu, nakon te naredbe u zasebne datoteke spremaju se dijagrami f0, spektralne ovojnice, aperiodičnosti te usporedbe signala prije i nakon sinteze world programom.
+1. Create virtual environment 
+  * `virtual_env env_name`
+2. Activate virtual environment
+  * more on [how to activate virtual environment][2].
+3. Run installation of dependencies from requirements.txt
+  * `pip install -r requirements.txt`
+4. Move to the cloned repository folder 
+5. Run script for dividing sounds in separate .wav folders
+  * `python get_voice.py`
+6. Run script which calculates the fundamental frequency (f0), spectral envelop and aperiodicity and does the synthesis.
+  * `python estimation.py`
+  
+Results of the above script are saved into separate folders where you can find diagrams of f0, spectral envelop, aperiodicity and some of signal before and after synthesis with the world program.
+
+[1]: https://docs.python-guide.org/dev/virtualenvs/ "Virtual environment activation"
