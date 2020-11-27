@@ -3,7 +3,7 @@
 1. Create virtual environment 
   * `virtual_env env_name`
 2. Activate virtual environment
-  * more on [how to activate virtual environment][2].
+  * more on [how to activate virtual environment][1].
 3. Run installation of dependencies from requirements.txt
   * `pip install -r requirements.txt`
 4. Move to the cloned repository folder 
