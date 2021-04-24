@@ -102,3 +102,10 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+.history
+
+# ignore outputs
+zvucni_*
+rijeci_*
+slike_*
