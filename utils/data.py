@@ -99,15 +99,13 @@ def speech_parametrization():
     wav_directory.sort()
 
     # passes through the veprad directories in parallel and cut sounds by position in the word (begin, middle, end)
-    current_index = 0
-    directory_length = len(lab_directory)
-    while current_index != directory_length:
+    for file in lab_directory:
+        file_name = file.split('.')[0]
         lab_file = open(
-            f'{VEPRAD_LAB_DIRECTORY}/{lab_directory[current_index]}', 'r')
+            f'{VEPRAD_LAB_DIRECTORY}/{file_name}.lab', 'r')
         txt_file = open(
-            f'{VEPRAD_TXT_DIRECTORY}/{txt_directory[current_index]}', 'r')
-        wav_file_path = f'{VEPRAD_WAV_DIRECTORY}/{wav_directory[current_index]}'
-        wav_file_name = wav_directory[current_index].split('.')[0]
+            f'{VEPRAD_TXT_DIRECTORY}/{file_name}.txt', 'r')
+        wav_file_path = f'{VEPRAD_WAV_DIRECTORY}/{file_name}.wav'
 
         lab_lines = lab_file.read().splitlines()
         txt_words = [line.split(' ') for line in txt_file.readlines()][0]
@@ -116,13 +114,11 @@ def speech_parametrization():
         for word in txt_words:
             word_length = len(word)
             cut_word(lab_lines, lab_file_position, lab_file_position +
-                     word_length, wav_file_path, word, wav_file_name)
+                     word_length, wav_file_path, word, file_name)
 
         for sound in SOUNDS:
             cut_sounds(sound, lab_lines, txt_words,
-                       wav_file_path, wav_file_name)
+                       wav_file_path, file_name)
 
         lab_file.close()
         txt_file.close()
-
-        current_index += 1

@@ -5,7 +5,7 @@ import numpy as np
 
 from .directories import create_synthesis_directories, create_plots_synthesis_directories, create_plots_directories
 from .plotting import savefig, plot_f0, plot_f0_comparison
-from constants.common import PROCESSED_WORDS_DIRECTORY, PROCESSED_SOUNDS_DIRECTORY, PLOTS_SYNTHESIS_WORDS_DIRECTORY, PLOTS_SOUNDS_DIRECTORY, PLOTS_SOUNDS_F0_COMPARISON_DIRECTORY, SYNTHESIS_WORDS_DIRECTORY, SYNTHESIS_SOUNDS_DIRECTORY, VEPRAD_TXT_DIRECTORY, VEPRAD_WAV_DIRECTORY, SOUNDS
+from constants.common import PROCESSED_WORDS_DIRECTORY, PROCESSED_SOUNDS_DIRECTORY, PLOTS_SYNTHESIS_WORDS_DIRECTORY, PLOTS_SOUNDS_DIRECTORY, PLOTS_SOUNDS_F0_COMPARISON_DIRECTORY, SYNTHESIS_WORDS_DIRECTORY, SYNTHESIS_SOUNDS_DIRECTORY, VEPRAD_TXT_DIRECTORY, SOUNDS
 
 
 def process_acoustic_parameters(sound, sound_position, file_name):
@@ -105,18 +105,14 @@ def estimation():
     create_plots_directories()
 
     txt_directory = os.listdir(VEPRAD_TXT_DIRECTORY)
-    wav_directory = os.listdir(VEPRAD_WAV_DIRECTORY)
-
     txt_directory.sort()
-    wav_directory.sort()
 
-    current_index = 0
-    for file in wav_directory:
+    for file in txt_directory:
+        file_name, _ = file.split('.')
         txt_file = open(
-            f'{VEPRAD_TXT_DIRECTORY}/{txt_directory[current_index]}', 'r')
+            f'{VEPRAD_TXT_DIRECTORY}/{file}', 'r')
         txt_words = [line.split(' ') for line in txt_file.readlines()][0]
 
-        file_name, _ = file.split('.')
         for word in txt_words:
             word_synthesis(word, file_name)
 

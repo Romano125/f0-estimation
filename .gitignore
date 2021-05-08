@@ -105,11 +105,7 @@ venv.bak/
 
 .history
 
-# ignore outputs
-zvucni_*
-rijeci_*
-slike_*
-
+# ignored directories
 veprad_processed
 synthesis
 plots
