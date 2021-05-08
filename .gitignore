@@ -109,3 +109,7 @@ venv.bak/
 zvucni_*
 rijeci_*
 slike_*
+
+veprad_processed
+synthesis
+plots
