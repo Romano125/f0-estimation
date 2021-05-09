@@ -1,7 +1,8 @@
 import os
 
+from utils.acoustic_parameters import acoustic_parameters_analysis
 from utils.data import speech_parametrization
-from utils.estimation import estimation
+from utils.synthesis import synthesis
 
 
 def main():
@@ -9,7 +10,8 @@ def main():
         os.mkdir('plots')
 
     speech_parametrization()
-    estimation()
+    acoustic_parameters_analysis()
+    synthesis()
 
 
 if __name__ == '__main__':

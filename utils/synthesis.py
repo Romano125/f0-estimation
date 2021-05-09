@@ -5,12 +5,10 @@ import numpy as np
 
 from .directories import create_synthesis_directories, create_plots_synthesis_directories, create_plots_directories
 from .plotting import savefig, plot_f0, plot_f0_comparison
-from constants.common import PROCESSED_WORDS_DIRECTORY, PROCESSED_SOUNDS_DIRECTORY, PLOTS_SYNTHESIS_WORDS_DIRECTORY, PLOTS_SOUNDS_DIRECTORY, PLOTS_SOUNDS_F0_COMPARISON_DIRECTORY, SYNTHESIS_WORDS_DIRECTORY, SYNTHESIS_SOUNDS_DIRECTORY, VEPRAD_TXT_DIRECTORY, SOUNDS
+from constants.common import PROCESSED_WORDS_DIRECTORY, PROCESSED_SOUNDS_DIRECTORY, PLOTS_SYNTHESIS_WORDS_DIRECTORY, PLOTS_SOUNDS_DIRECTORY, SYNTHESIS_WORDS_DIRECTORY, SYNTHESIS_SOUNDS_DIRECTORY, VEPRAD_TXT_DIRECTORY, SOUNDS
 
 
-def process_acoustic_parameters(sound, sound_position, word, file_name):
-    f0_max = 0
-    is_processed = False
+def sound_synthesis(sound, sound_position, word, file_name):
     file = f'{PROCESSED_SOUNDS_DIRECTORY}/{sound_position}/{file_name}_{word}_{sound}.wav'
     if os.path.exists(file):
         data, samplerate = sf.read(file)
@@ -30,39 +28,15 @@ def process_acoustic_parameters(sound, sound_position, word, file_name):
 
         sf.write(
             f'{SYNTHESIS_SOUNDS_DIRECTORY}/{sound_position}/{file_name}_{word}_{sound}.wav', synthesized_sound, samplerate)
-
-        plot_f0(sound, sound_position, timeaxis, f0, f0_mask,
-                f'{PLOTS_SOUNDS_DIRECTORY}/{sound_position}/f0/{file_name}_{word}_{sound}.png')
         savefig(
             f'{PLOTS_SOUNDS_DIRECTORY}/{sound_position}/synthesis_comparison/{file_name}_{word}_{sound}.png', [data, synthesized_sound], sound)
-        savefig(
-            f'{PLOTS_SOUNDS_DIRECTORY}/{sound_position}/spectral_envelop/{file_name}_{word}_{sound}.png', [spectral_envelop], sound)
-        savefig(
-            f'{PLOTS_SOUNDS_DIRECTORY}/{sound_position}/aperiodicity/{file_name}_{word}_{sound}.png', [aperiodicity], sound, log=False)
-        f0_max = np.max(f0)
-        is_processed = True
-    return f0_max, is_processed
 
 
 def process_sound(txt_words, sound, file_name):
-    is_f0_begin_found = False
-    is_f0_middle_found = False
-    is_f0_end_found = False
-    f0_begin = 0
-    f0_middle = 0
-    f0_end = 0
-
     for word in txt_words:
-        f0_begin, is_f0_begin_found = process_acoustic_parameters(
-            sound, 'begin', word, file_name)
-        f0_middle, is_f0_middle_found = process_acoustic_parameters(
-            sound, 'middle', word, file_name)
-        f0_end, is_f0_end_found = process_acoustic_parameters(
-            sound, 'end', word, file_name)
-
-        if is_f0_begin_found and is_f0_middle_found and is_f0_end_found:
-            plot_f0_comparison(sound, f0_begin, f0_middle, f0_end,
-                               f'{PLOTS_SOUNDS_F0_COMPARISON_DIRECTORY}/{file_name}_{word}_{sound}.png')
+        sound_synthesis(sound, 'begin', word, file_name)
+        sound_synthesis(sound, 'middle', word, file_name)
+        sound_synthesis(sound, 'end', word, file_name)
 
 
 def word_synthesis(word, file_name):
@@ -100,7 +74,7 @@ def word_synthesis(word, file_name):
                 [data, synthesized_word], word)
 
 
-def estimation():
+def synthesis():
     create_synthesis_directories()
     create_plots_synthesis_directories()
     create_plots_directories()
