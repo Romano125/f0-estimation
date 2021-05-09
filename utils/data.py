@@ -23,60 +23,25 @@ def save_cutted_piece(start_time, end_time, wav_file, file_path):
 
 def cut_sounds(sound, lab, txt_words, wav_file, file_name):
     lab_file_position = 1
-    is_begin_sound_found = False
-    is_middle_sound_found = False
-    is_end_sound_found = False
-    time = {}
-    '''
-    TODO
-    {
-        autocesta: {
-            a: {
-                begin: {t1: 45, t2: 50}
-                end:
-            }
-        },
-        auto: {
-            a: {
-                begin:
-                middle:
-                end:
-            }
-        },
-    }
-    '''
 
-    # u petlji pronalazim početak i završetak zvučnog glasa pomičući se istovremeno kroz .lab (sadrži trajanje glasa) i .txt_words datoteku
+    # find begin and end time for sound in word
     for word in txt_words:
-        if is_begin_sound_found == True and is_middle_sound_found == True and is_end_sound_found == True:
-            break
-
         word_length = len(word)
         if word_length > 1:
             for i, letter in enumerate(word):
                 sound_start, sound_end = find(lab, lab_file_position)
-                if letter == sound and i == 0 and is_begin_sound_found == False:
-                    time.update({f'{sound}_begin_start_time': sound_start})
-                    time.update({f'{sound}_begin_end_time': sound_end})
-                    is_begin_sound_found = True
-                elif letter == sound and (i > 0 and i < word_length - 1) and is_middle_sound_found == False:
-                    time.update({f'{sound}_middle_start_time': sound_start})
-                    time.update({f'{sound}_middle_end_time': sound_end})
-                    is_middle_sound_found = True
-                elif letter == sound and i >= word_length - 1 and is_end_sound_found == False:
-                    time.update({f'{sound}_end_start_time': sound_start})
-                    time.update({f'{sound}_end_end_time': sound_end})
-                    is_end_sound_found = True
+                if letter == sound and i == 0:
+                    save_cutted_piece(sound_start, sound_end, wav_file,
+                                      f'{PROCESSED_SOUNDS_BEGIN_DIRECTORY}/{file_name}_{word}_{sound}.wav')
+                elif letter == sound and (i > 0 and i < word_length - 1):
+                    save_cutted_piece(sound_start, sound_end, wav_file,
+                                      f'{PROCESSED_SOUNDS_MIDDLE_DIRECTORY}/{file_name}_{word}_{sound}.wav')
+                elif letter == sound and i >= word_length - 1:
+                    save_cutted_piece(sound_start, sound_end, wav_file,
+                                      f'{PROCESSED_SOUNDS_END_DIRECTORY}/{file_name}_{word}_{sound}.wav')
                 lab_file_position += 1
         else:
             lab_file_position += 1
-
-    save_cutted_piece(time.get(f'{sound}_begin_start_time'), time.get(f'{sound}_begin_end_time'), wav_file,
-                      f'{PROCESSED_SOUNDS_BEGIN_DIRECTORY}/{file_name}_{sound}.wav')
-    save_cutted_piece(time.get(f'{sound}_middle_start_time'), time.get(f'{sound}_middle_end_time'), wav_file,
-                      f'{PROCESSED_SOUNDS_MIDDLE_DIRECTORY}/{file_name}_{sound}.wav')
-    save_cutted_piece(time.get(f'{sound}_end_start_time'), time.get(f'{sound}_end_end_time'), wav_file,
-                      f'{PROCESSED_SOUNDS_END_DIRECTORY}/{file_name}_{sound}.wav')
 
 
 def cut_word(lab_lines, word_first_index, word_last_index, wav_file, word, file_name):
@@ -110,7 +75,7 @@ def speech_parametrization():
         lab_lines = lab_file.read().splitlines()
         txt_words = [line.split(' ') for line in txt_file.readlines()][0]
 
-        lab_file_position = 1  # because we skip first line in .lab file
+        lab_file_position = 1  # we skip first line in .lab file
         for word in txt_words:
             word_length = len(word)
             cut_word(lab_lines, lab_file_position, lab_file_position +
