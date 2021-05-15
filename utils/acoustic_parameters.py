@@ -1,11 +1,19 @@
 import os
-import soundfile as sf
-import pyworld as pw
+import pysptk
 import numpy as np
+import pyworld as pw
+import soundfile as sf
 
 from .directories import create_plots_directories
 from .plotting import savefig, plot_f0, plot_f0_comparison
 from constants.common import PROCESSED_SOUNDS_DIRECTORY, PLOTS_SOUNDS_DIRECTORY, PLOTS_SOUNDS_F0_COMPARISON_DIRECTORY, VEPRAD_TXT_DIRECTORY, SOUNDS
+
+
+def arange(length, step):
+    array = [0] * length
+    for i in range(length):
+        array[i] = i * step
+    return array
 
 
 def get_average_f0_by_sound_position(sound, sound_position):
@@ -29,17 +37,29 @@ def process_acoustic_parameters(sound, sound_position, word, file_name):
     if os.path.exists(file):
         data, samplerate = sf.read(file)
 
-        """
-        f0_dio, timeaxis_dio = pw.dio(beg, samplerate, f0_floor=70.0, f0_ceil=800.0, channels_in_octave=3.0,
-                                      frame_period=args.frame_period,
-                                      speed=args.speed)
-        """
-        f0, timeaxis = pw.harvest(data, samplerate)
+        frame_period = 5  # ms
+        hop_length = int(0.001 * samplerate * frame_period)
+
+        f0_dio, timeaxis_dio = pw.dio(data, samplerate)
+        f0, timeaxis = pw.harvest(
+            data, samplerate, frame_period)
         f0_mask = pw.stonemask(data, f0, timeaxis, samplerate)
         spectral_envelop = pw.cheaptrick(data, f0_mask, timeaxis, samplerate)
         aperiodicity = pw.d4c(data, f0_mask, timeaxis, samplerate)
 
-        plot_f0(sound, sound_position, timeaxis, f0, f0_mask,
+        f0_rapt = pysptk.sptk.rapt(
+            data.astype(np.float32), samplerate, hop_length)
+
+        f0_swipe = pysptk.sptk.swipe(
+            data, samplerate, hop_length)
+
+        plot_f0(sound,
+                sound_position,
+                [timeaxis, f0],
+                [timeaxis_dio, f0_dio],
+                [arange(len(f0_rapt), 0.005), f0_rapt],
+                [arange(len(f0_swipe), 0.005), f0_swipe],
+                f0_mask,
                 f'{PLOTS_SOUNDS_DIRECTORY}/{sound_position}/f0/{file_name}_{word}_{sound}.png')
         savefig(
             f'{PLOTS_SOUNDS_DIRECTORY}/{sound_position}/spectral_envelop/{file_name}_{word}_{sound}.png', [spectral_envelop], sound)

@@ -44,15 +44,19 @@ def savefig(filename, figlist, sound, log=True):
     plt.close()
 
 
-def plot_f0(sound, sound_position, timeaxis, f0, f0_mask, file_path):
+def plot_f0(sound, sound_position, f0, f0_dio, f0_rapt, f0_swipe, f0_mask, file_path):
     plt.figure()
     plt.title(f'Sound {sound} at the {sound_position} of the word')
-    plt.plot(timeaxis, f0, 'r',
-             label='Estimated f0 with harvest')
-    # plt.plot(timeaxis_dio, f0_dio, 'y',
-    #          label='Estimated f0 with DIO')
-    plt.plot(timeaxis, f0_mask, 'g--',
+    plt.plot(f0[0], f0[1], 'r',
+             label='f0 - pyworld (harvest)')
+    plt.plot(f0_dio[0], f0_dio[1], 'y',
+             label='f0 - pyworld (dio)')
+    plt.plot(f0[0], f0_mask, 'g--',
              label='Cleaned f0 with stonemask')
+    plt.plot(f0_rapt[0], f0_rapt[1], 'b',
+             label='f0 - pysptk (rapt)')
+    plt.plot(f0_swipe[0], f0_swipe[1], 'orange',
+             label='f0 - pysptk (swipe)')
 
     plt.ylabel('Frequency (Hz)')
     plt.xlabel('Time (s)')
