@@ -8,9 +8,23 @@ from .plotting import savefig, plot_f0, plot_f0_comparison
 from constants.common import PROCESSED_SOUNDS_DIRECTORY, PLOTS_SOUNDS_DIRECTORY, PLOTS_SOUNDS_F0_COMPARISON_DIRECTORY, VEPRAD_TXT_DIRECTORY, SOUNDS
 
 
+def get_average_f0_by_sound_position(sound, sound_position):
+    processed_sounds_directory = f'{PROCESSED_SOUNDS_DIRECTORY}/{sound_position}'
+
+    if processed_sounds_directory == None:
+        return 0
+
+    f0_array = []
+    for file_name in os.listdir(processed_sounds_directory):
+        file = f'{processed_sounds_directory}/{file_name}'
+        if file_name.endswith(f'_{sound}.wav') and os.path.exists(file):
+            data, samplerate = sf.read(file)
+            f0, _ = pw.harvest(data, samplerate)
+            f0_array.append(np.max(f0))
+    return sum(f0_array) / len(f0_array) if len(f0_array) else 0
+
+
 def process_acoustic_parameters(sound, sound_position, word, file_name):
-    f0_max = 0
-    is_processed = False
     file = f'{PROCESSED_SOUNDS_DIRECTORY}/{sound_position}/{file_name}_{word}_{sound}.wav'
     if os.path.exists(file):
         data, samplerate = sf.read(file)
@@ -31,31 +45,28 @@ def process_acoustic_parameters(sound, sound_position, word, file_name):
             f'{PLOTS_SOUNDS_DIRECTORY}/{sound_position}/spectral_envelop/{file_name}_{word}_{sound}.png', [spectral_envelop], sound)
         savefig(
             f'{PLOTS_SOUNDS_DIRECTORY}/{sound_position}/aperiodicity/{file_name}_{word}_{sound}.png', [aperiodicity], sound, log=False)
-        f0_max = np.max(f0)
-        is_processed = True
-    return f0_max, is_processed
 
 
 def process_sound(txt_words, sound, file_name):
-    is_f0_begin_found = False
-    is_f0_middle_found = False
-    is_f0_end_found = False
-    f0_begin = 0
-    f0_middle = 0
-    f0_end = 0
-
     for word in txt_words:
-        f0_begin, is_f0_begin_found = process_acoustic_parameters(
+        process_acoustic_parameters(
             sound, 'begin', word, file_name)
-        f0_middle, is_f0_middle_found = process_acoustic_parameters(
+        process_acoustic_parameters(
             sound, 'middle', word, file_name)
-        f0_end, is_f0_end_found = process_acoustic_parameters(
+        process_acoustic_parameters(
             sound, 'end', word, file_name)
 
-        # TODO: compare sounds from different words not the same
-        if is_f0_begin_found and is_f0_middle_found and is_f0_end_found:
-            plot_f0_comparison(sound, f0_begin, f0_middle, f0_end,
-                               f'{PLOTS_SOUNDS_F0_COMPARISON_DIRECTORY}/{file_name}_{word}_{sound}.png')
+
+def compare_sounds_f0(sound):
+    average_f0s = []
+    sound_positions = ['begin', 'middle', 'end']
+
+    for sound_position in sound_positions:
+        average_f0s.append(
+            get_average_f0_by_sound_position(sound, sound_position))
+
+    plot_f0_comparison(sound, average_f0s[0], average_f0s[1], average_f0s[2],
+                       f'{PLOTS_SOUNDS_F0_COMPARISON_DIRECTORY}/{sound}.png')
 
 
 def acoustic_parameters_analysis():
@@ -72,3 +83,4 @@ def acoustic_parameters_analysis():
 
         for sound in SOUNDS:
             process_sound(txt_words, sound, file_name)
+            compare_sounds_f0(sound)

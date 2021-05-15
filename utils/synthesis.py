@@ -4,7 +4,7 @@ import pyworld as pw
 import numpy as np
 
 from .directories import create_synthesis_directories, create_plots_synthesis_directories, create_plots_directories
-from .plotting import savefig, plot_f0, plot_f0_comparison
+from .plotting import savefig
 from constants.common import PROCESSED_WORDS_DIRECTORY, PROCESSED_SOUNDS_DIRECTORY, PLOTS_SYNTHESIS_WORDS_DIRECTORY, PLOTS_SOUNDS_DIRECTORY, SYNTHESIS_WORDS_DIRECTORY, SYNTHESIS_SOUNDS_DIRECTORY, VEPRAD_TXT_DIRECTORY, SOUNDS
 
 
