@@ -79,7 +79,8 @@ def speech_parametrization():
         for word in txt_words:
             word_length = len(word)
             cut_word(lab_lines, lab_file_position, lab_file_position +
-                     word_length, wav_file_path, word, file_name)
+                     word_length - 1, wav_file_path, word, file_name)
+            lab_file_position += word_length
 
         for sound in SOUNDS:
             cut_sounds(sound, lab_lines, txt_words,
