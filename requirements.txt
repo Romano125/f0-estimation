@@ -15,6 +15,6 @@ autopep8==1.5.7
 decorator==5.0.8
 pycodestyle==2.7.0
 pysptk==0.1.18
-scipy==1.5.4
+scipy==1.10.0
 six==1.16.0
 toml==0.10.2
